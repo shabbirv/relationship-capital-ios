@@ -25,4 +25,7 @@
 @property (nonatomic, assign) int rcScore;
 @property (nonatomic, assign) BOOL isLoggedIn;
 
+
+- (void)logoutUser;
+
 @end

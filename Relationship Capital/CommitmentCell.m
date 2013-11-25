@@ -23,11 +23,13 @@
 - (void)setCommitment:(Commitment *)commitment {
     _commitment = commitment;
     textLabel.text = commitment.name;
-    if (commitment.status == CommitmentStatusPending && ![commitment isKindOfClass:[Request class]]) {
-        colorView.backgroundColor = [self colorForDifficulty:_commitment.difficulty];
-    } else {
-        colorView.backgroundColor = [UIColor whiteColor];
-    }
+//    if ((commitment.status == CommitmentStatusPending || commitment.status == CommitmentStatusOngoing) && ![commitment isKindOfClass:[Request class]]) {
+//        colorView.backgroundColor = [self colorForDifficulty:_commitment.difficulty];
+//    } else {
+//        colorView.backgroundColor = [UIColor whiteColor];
+//    }
+    colorView.backgroundColor = [self colorForDifficulty:_commitment.difficulty];
+
 }
 
 - (UIColor *)colorForDifficulty:(DifficultyLevel)diff {

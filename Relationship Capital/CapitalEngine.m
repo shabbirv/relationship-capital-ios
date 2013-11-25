@@ -283,4 +283,32 @@
     }];
 }
 
+- (void)addUserAsFriend:(User *)user completion:(Completion)block {
+    NSDictionary *dict = @{
+                           @"authentication_token": [User currentUser].authToken,
+                           @"requested_user_id" : @(user.userId)};
+    AFHTTPClient *client = [CapitalEngine client];
+    [client postPath:@"/api/v1/friendships" parameters:dict success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        NSLog(@"%@", responseObject);
+        if (block) {
+            block();
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+
+        NSLog(@"Fail: %@\n%@", operation.responseString, error.localizedDescription);
+    }];
+}
+
+- (void)getUserDetail:(User *)user completion:(ResultBlock)block {
+    AFHTTPClient *client = [CapitalEngine client];
+    [client getPath:@"/api/v1/users" parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
+        if (block) {
+            block(responseObject, nil);
+        }
+    } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
+        
+        NSLog(@"Fail: %@\n%@", operation.responseString, error.localizedDescription);
+    }];
+}
+
 @end

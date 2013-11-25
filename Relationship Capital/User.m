@@ -28,4 +28,18 @@
     return NO;
 }
 
+- (void)logoutUser {
+    self.authToken = @"";
+    self.email = @"";
+    self.firstName = @"";
+    self.lastName = @"";
+    self.dashboardAPIUrl = @"";
+    self.username = @"";
+    self.userId = 0;
+    self.rcScore = 0;
+    self.friends = nil;
+    self.commitments = nil;
+    self.requests = nil;
+}
+
 @end

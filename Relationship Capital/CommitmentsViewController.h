@@ -13,7 +13,7 @@
 #import "AddCommitmentViewController.h"
 #import "CommitmentCell.h"
 
-@interface CommitmentsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
+@interface CommitmentsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate> {
     IBOutlet UITableView *theTableView;
     int selectedCommitmentId;
 }

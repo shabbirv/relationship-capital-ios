@@ -112,6 +112,8 @@
                 declineButton.hidden = YES;
                 completeButton.hidden = NO;
                 controlsView.frame = CGRectMake(x, y, controlsView.frame.size.width, controlsView.frame.size.height);
+            } else {
+                controlsView.frame = CGRectMake(x, y, controlsView.frame.size.width, detailsTextView.frame.origin.y + detailsTextView.frame.size.height);
             }
         } else if (_commitment.status == CommitmentStatusSubmitted) {
             [completeButton setTitle:@"Approve" forState:UIControlStateNormal];
@@ -208,6 +210,7 @@
     
     if (cell == nil) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"CellIdentifier"];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
         cell.detailTextLabel.numberOfLines = 4;
     }
     

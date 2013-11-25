@@ -22,18 +22,41 @@
     //Listen for when dashboard is loaded
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(dashboardLoaded:) name:@"kDashboardLoaded" object:nil];
     
+    //Clear commitment id
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(clearCommitmentId:) name:@"kClearCommitmentId" object:nil];
     
+    //Add listener for logout
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didLogout:) name:@"kUserDidLogout" object:nil];
+    
     //Add plus button
-    UIBarButtonItem *plus = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"plus"] style:UIBarButtonItemStyleBordered target:self action:@selector(addCommitment)];
+    UIBarButtonItem *plus = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"plus"]
+                                                             style:UIBarButtonItemStyleBordered target:self action:@selector(addCommitment)];
     plus.tintColor = [UIColor darkGrayColor];
     self.navigationItem.rightBarButtonItem = plus;
     
+    
+    //Add logout button
+    UIBarButtonItem *logout = [[UIBarButtonItem alloc] initWithTitle:@"Logout" style:UIBarButtonItemStyleBordered target:self action:@selector(logout)];
+    logout.tintColor = [UIColor alizarinColor];
+    self.navigationItem.leftBarButtonItem = logout;
+
     
     selectedCommitmentId = 0;
     
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+}
+
+- (void)logout {
+    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Are you sure?" delegate:self cancelButtonTitle:nil destructiveButtonTitle:@"Logout" otherButtonTitles:nil];
+    [sheet showFromBarButtonItem:self.navigationItem.leftBarButtonItem animated:YES];
+}
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == actionSheet.destructiveButtonIndex) {
+        [[User currentUser] logoutUser];
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kUserDidLogout" object:nil];
+    }
 }
 
 //Called when adding a new commitment
@@ -52,12 +75,17 @@
     selectedCommitmentId = 0;
 }
 
+- (void)didLogout:(NSNotification *)notification {
+    selectedCommitmentId = 0;
+    [theTableView reloadData];
+}
+
 - (void)dashboardLoaded:(NSNotification *)notification {
     [theTableView reloadData];
     if (selectedCommitmentId != 0) {
         for (int i = 0; i < _user.commitments.count; i++) {
             Commitment *commitment = [_user.commitments objectAtIndex:i];
-            if (commitment.commitmentId == selectedCommitmentId) {
+            if (commitment.commitmentId == selectedCommitmentId && commitment.status != CommitmentStatusApproved) {
                 if ([_delegate respondsToSelector:@selector(tappedCommitment:)])
                     [_delegate tappedCommitment:commitment];
                 return;

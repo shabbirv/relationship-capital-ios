@@ -14,6 +14,7 @@
 #import <ios-linechart/LineChart.h>
 #import "FriendsTableViewCell.h"
 #import "CommitmentDetailViewController.h"
+#import "UserPickerViewController.h"
 
 @interface ProfileViewController : UIViewController <UITableViewDataSource, UITableViewDelegate> {
     IBOutlet AvatarView *avatarView;
@@ -22,6 +23,9 @@
     IBOutlet UILabel *commitmentCountLabel;
     IBOutlet UILabel *requestCountLabel;
     IBOutlet UITableView *theTableView;
+    UIPopoverController *popOver;
+    NSMutableArray *usersArray;
+    BOOL youFollow;
 }
 
 @property (nonatomic, weak) User *user;

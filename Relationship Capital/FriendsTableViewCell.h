@@ -17,5 +17,5 @@
 }
 
 @property (nonatomic, weak) Friend *friend;
-
+@property  User *user;
 @end

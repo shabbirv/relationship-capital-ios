@@ -32,4 +32,6 @@ typedef void(^Completion)();
 - (void)addCommitment:(NSDictionary *)commitmentDict completion:(Completion)block;
 - (void)addComment:(NSString *)comment forCommitment:(Commitment *)commitment completion:(Completion)completion;
 - (void)getCommentsForCommitment:(Commitment *)commitment completion:(ResultBlock)block;
+- (void)addUserAsFriend:(User *)user completion:(Completion)block;
+- (void)getUserDetail:(User *)user completion:(ResultBlock)block;
 @end

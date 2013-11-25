@@ -25,15 +25,38 @@
 
 - (void)viewDidLoad
 {
+    
+    //Remove you and people you follow from the list
+    if (_pickerForFollowing) {
+        NSMutableArray *indexsToRemove = [NSMutableArray array];
+        for (int i = 0; i < _usersArray.count; i++) {
+            User *user = _usersArray[i];
+            if (user.userId == [User currentUser].userId) {
+                [indexsToRemove addObject:user];
+            }
+            for (int j = 0; j < [User currentUser].friends.count; j++) {
+                User *user1 = [User currentUser].friends[j];
+                if (user.userId == user1.userId) {
+                    [indexsToRemove addObject:user];
+                }
+            }
+        }
+        for (int i = 0; i < indexsToRemove.count; i++) {
+            [_usersArray removeObject:indexsToRemove[i]];
+        }
+    }
+    
     //Set height of table
     theTableView.rowHeight = 44;
     [theTableView reloadData];
     
     
     //Add plus button
-    UIBarButtonItem *choose = [[UIBarButtonItem alloc] initWithTitle:@"Choose" style:UIBarButtonItemStyleBordered target:self action:@selector(chooseAction)];
-    self.navigationItem.rightBarButtonItem = choose;
-    self.navigationItem.rightBarButtonItem.enabled = NO;
+    if (!_pickerForFollowing) {
+        UIBarButtonItem *choose = [[UIBarButtonItem alloc] initWithTitle:@"Choose" style:UIBarButtonItemStyleBordered target:self action:@selector(chooseAction)];
+        self.navigationItem.rightBarButtonItem = choose;
+        self.navigationItem.rightBarButtonItem.enabled = NO;
+    }
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
@@ -46,7 +69,6 @@
 }
 
 - (void)viewDidAppear:(BOOL)animated {
-    [self.searchDisplayController.searchBar becomeFirstResponder];
     self.searchDisplayController.searchResultsTableView.backgroundColor = [UIColor whiteColor];
     [super viewDidAppear:animated];
 }
@@ -116,35 +138,44 @@
     User *user = nil;
     if (tableView == theTableView) {
         user = _usersArray[indexPath.row];
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        if (user.userId == _selectedUser.userId) {
-            [tableView deselectRowAtIndexPath:indexPath animated:YES];
-            _selectedUser = nil;
-            self.navigationItem.rightBarButtonItem.enabled = NO;
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        } else {
-            NSInteger row = [_usersArray indexOfObject:_selectedUser];
-            UITableViewCell *cell1 = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-            _selectedUser = user;
-            self.navigationItem.rightBarButtonItem.enabled = YES;
-            cell1.accessoryType = UITableViewCellAccessoryNone;
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        }
     } else {
         user = [self arrayForSearchText][indexPath.row];
-        UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-        if (user.userId == _selectedUser.userId) {
-            [tableView deselectRowAtIndexPath:indexPath animated:YES];
-            _selectedUser = nil;
-            self.navigationItem.rightBarButtonItem.enabled = NO;
-            cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+    if (_pickerForFollowing) {
+        _selectedUser = user;
+        UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Add this connection?" delegate:self cancelButtonTitle:@"Cancel" destructiveButtonTitle:nil otherButtonTitles:@"Yes", nil];
+        [sheet showInView:self.view];
+    } else {
+        if (tableView == theTableView) {
+            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+            if (user.userId == _selectedUser.userId) {
+                [tableView deselectRowAtIndexPath:indexPath animated:YES];
+                _selectedUser = nil;
+                self.navigationItem.rightBarButtonItem.enabled = NO;
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            } else {
+                NSInteger row = [_usersArray indexOfObject:_selectedUser];
+                UITableViewCell *cell1 = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+                _selectedUser = user;
+                self.navigationItem.rightBarButtonItem.enabled = YES;
+                cell1.accessoryType = UITableViewCellAccessoryNone;
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            }
         } else {
-            NSInteger row = [[self arrayForSearchText] indexOfObject:_selectedUser];
-            UITableViewCell *cell1 = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
-            _selectedUser = user;
-            self.navigationItem.rightBarButtonItem.enabled = YES;
-            cell1.accessoryType = UITableViewCellAccessoryNone;
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            UITableViewCell *cell = [tableView cellForRowAtIndexPath:indexPath];
+            if (user.userId == _selectedUser.userId) {
+                [tableView deselectRowAtIndexPath:indexPath animated:YES];
+                _selectedUser = nil;
+                self.navigationItem.rightBarButtonItem.enabled = NO;
+                cell.accessoryType = UITableViewCellAccessoryNone;
+            } else {
+                NSInteger row = [[self arrayForSearchText] indexOfObject:_selectedUser];
+                UITableViewCell *cell1 = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:row inSection:0]];
+                _selectedUser = user;
+                self.navigationItem.rightBarButtonItem.enabled = YES;
+                cell1.accessoryType = UITableViewCellAccessoryNone;
+                cell.accessoryType = UITableViewCellAccessoryCheckmark;
+            }
         }
     }
     
@@ -157,6 +188,21 @@
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar {
     [theTableView reloadData];
+}
+
+#pragma mark UIActionSheetDelegate
+
+- (void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex {
+    if (buttonIndex == actionSheet.cancelButtonIndex) {
+        _selectedUser = nil;
+    } else {
+        [[CapitalEngine sharedEngine] addUserAsFriend:_selectedUser completion:^{
+            NSInteger row = [_usersArray indexOfObject:_selectedUser];
+            [_usersArray removeObject:_selectedUser];
+            [theTableView deleteRowsAtIndexPaths:@[[NSIndexPath indexPathForRow:row inSection:0]] withRowAnimation:UITableViewRowAnimationRight];
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"kShouldLoadDashboard" object:nil];
+        }];
+    }
 }
 
 - (void)didReceiveMemoryWarning

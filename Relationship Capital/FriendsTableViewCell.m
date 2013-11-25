@@ -45,6 +45,9 @@
     if (friend.friendStatus != FriendStatusRequest) {
         acceptButton.hidden = YES;
         declineButton.hidden = YES;
+    } else {
+        acceptButton.hidden = NO;
+        declineButton.hidden = NO;
     }
 }
 
@@ -56,12 +59,13 @@
         declineButton.enabled = YES;
         acceptButton.hidden = YES;
         declineButton.hidden = YES;
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kShouldLoadDashboard" object:nil];
     }];
 }
 
 - (void)declineAction {
     [[CapitalEngine sharedEngine] respondToFriendRequestWithId:_friend.friendshipId shouldAccept:NO completion:^{
-        
+        [[NSNotificationCenter defaultCenter] postNotificationName:@"kShouldLoadDashboard" object:nil];
     }];
 }
 
