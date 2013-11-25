@@ -115,7 +115,7 @@
             } else {
                 controlsView.frame = CGRectMake(x, y, controlsView.frame.size.width, detailsTextView.frame.origin.y + detailsTextView.frame.size.height);
             }
-        } else if (_commitment.status == CommitmentStatusSubmitted) {
+        } else if (_commitment.status == CommitmentStatusSubmitted && _commitment.issuerId == [User currentUser].userId) {
             [completeButton setTitle:@"Approve" forState:UIControlStateNormal];
             completeButton.hidden = NO;
             acceptButton.hidden = YES;

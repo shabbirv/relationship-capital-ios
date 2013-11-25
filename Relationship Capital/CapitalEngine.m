@@ -42,8 +42,9 @@
     [client postPath:@"/api/v1/user" parameters:dict success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *resultDict = responseObject;
         User *user = [User currentUser];
-        user.authToken = resultDict[@"auth_token"];
-        user.email = resultDict[@"current_user_email"];
+        user.authToken = resultDict[@"authentication_token"];
+        user.email = resultDict[@"new_user"][@"user"][@"email"];
+        user.userId = [resultDict[@"new_user"][@"user"][@"id"] intValue];
         NSLog(@"%@", resultDict);
         if (completionBlock) {
             completionBlock(resultDict, nil);
@@ -83,6 +84,9 @@
 }
 
 - (void)getDashboardForUser:(User *)user completion:(ResultBlock)block {
+    if (!user.dashboardAPIUrl) {
+       user.dashboardAPIUrl = [NSString stringWithFormat:@"/api/v1/users/%d", user.userId];
+    }
     AFHTTPClient *client = [CapitalEngine client];
     [client getPath:user.dashboardAPIUrl parameters:nil success:^(AFHTTPRequestOperation *operation, id responseObject) {
         NSDictionary *userDict = responseObject[@"user"];
