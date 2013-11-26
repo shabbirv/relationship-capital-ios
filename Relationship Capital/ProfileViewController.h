@@ -26,6 +26,7 @@
     UIPopoverController *popOver;
     NSMutableArray *usersArray;
     BOOL youFollow;
+    UIRefreshControl *refreshControl;
 }
 
 @property (nonatomic, weak) User *user;

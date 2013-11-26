@@ -16,6 +16,7 @@
 @interface CommitmentsViewController : UIViewController <UITableViewDataSource, UITableViewDelegate, UIActionSheetDelegate> {
     IBOutlet UITableView *theTableView;
     int selectedCommitmentId;
+    UIRefreshControl *refreshControl;
 }
 
 @property (nonatomic, weak) User *user;

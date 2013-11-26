@@ -47,6 +47,13 @@
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didLogout:) name:@"kUserDidLogout" object:nil];
     }
     
+    //Add refresh control
+    refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(shouldLoadDashboard:)
+             forControlEvents:UIControlEventValueChanged];
+    [theTableView addSubview:refreshControl];
+
+    
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
 }
@@ -128,7 +135,7 @@
                 self.navigationItem.rightBarButtonItem = follow;
             }
         }
-        
+        [refreshControl endRefreshing];
     }];
 }
 

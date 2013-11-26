@@ -43,8 +43,21 @@
     
     selectedCommitmentId = 0;
     
+    //Refresh Control
+    //Add refresh control
+    refreshControl = [[UIRefreshControl alloc] init];
+    [refreshControl addTarget:self action:@selector(refresh)
+             forControlEvents:UIControlEventValueChanged];
+    [theTableView addSubview:refreshControl];
+
+    
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+}
+
+- (void)refresh {
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"kShouldLoadDashboard" object:nil];
+    [refreshControl performSelector:@selector(endRefreshing) withObject:nil afterDelay:1.0];
 }
 
 - (void)logout {
